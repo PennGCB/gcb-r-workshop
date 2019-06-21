@@ -4,7 +4,7 @@ TODO:
 
 + [ ] Make initial todo-list, either here or in issues
 
-PREAMPLE:
+PREAMBLE:
 + [ ] Write up the instruction about what students need to do before the workshop
 + [ ] Prepare a R markdown file with the following content
   + [ ] Install R and Rstudio
