@@ -43,7 +43,6 @@ colnames(energy_mod)= c("electricity",
                         "fuel_oil",
                         "natural_gas", 
                         "greenhouse_emissions")
-ggplot2::ggplot(energy_mod, aes(x=as.factor(property_type))) + geom_bar()
 # greenhouse_emissions -- total greenhouse gas emissions in MtCO2e
 # electricity -- total reported electricity usage (kbtu)
 # natural_gas -- total natural gas usage (kbtu)
@@ -53,5 +52,4 @@ ggplot2::ggplot(energy_mod, aes(x=as.factor(property_type))) + geom_bar()
 tencommon = names(sort(table(energy_mod$postal_code))[69:78])
 energy_mod = energy_mod %>% filter(postal_code %in% tencommon) 
 #energy_mod = energy_mod %>% filter(!is.na(water_use))
-View(energy_mod)
 write.csv(energy_mod, file="city_energy_data.csv")
