@@ -1,0 +1,79 @@
+---
+title: "R_workshop_preamble"
+author: "Binglan Li"
+date: "8/13/2019"
+output: html_document
+---
+
+# Preamble
+
+## 1. Installing R Packages
+
+Run the following chunk of codes to install necessary packages for this workshop. These packages can be useful for statistical analysis or data visualization for your future class work or research.
+
+```{r install packages, eval=FALSE, include=FALSE}
+# the command to install a R package
+install.packages("ggplot2", repos = "https://cran.rstudio.com")
+install.packages("dplyr", repos = "https://cran.rstudio.com")
+install.packages("RColorBrewer", repos = "https://cran.rstudio.com")
+
+# ggplot2 and dplyr are parts of a larger R package called 'tidyverse'
+# you can use the following code just install all packages in 'tidyverse'
+#install.packages("tidyverse")
+
+# if you cannot install certain packages using the above codes, try the following
+#devtools::install_github("tidyverse/ggplot2")
+#devtools::install_github("tidyverse/dplyr")
+```
+
+## 2. Learn to Load R Packages
+
+Remember that successfully installing a R package does not mean that it will be automatically loaded to your R environment afterwards. Everytime you newly install a R package or open Rstudio, you need to load the R packages by yourself using **libarary()**. Run the following chunk of codes to load R packages.
+
+```{r load packages, eval=FALSE, include=FALSE}
+# now, actual commands to load library
+library(ggplot2)
+library(dplyr)
+library(RColorBrewer)
+
+# now use the command to see if you have successfully load ggplot2 in your environment
+ggplot()
+```
+
+## 3. Helpful functions in Rstudio
+
+  1. Automatic filling using the 'Tab' key. 
+  2. **?function_name** to look up description and manual for a R function
+  3. **Command + Enter** in Mac and **Control + Enter** in Windows to execute the line of source code where the cursor currently resides
+
+```{r helpful function, eval=FALSE, include=FALSE}
+# automatic filling
+# try to find the mean() function, which calculates the mean of input vectors, using the 'tab' key immediate folloing 'me'
+me
+
+# manual lookup
+?mean
+
+# try to execute the following code with the shortcut
+mean(c(1,2,3))
+```
+
+
+## Reference and Helpful Materials
+
+#### Online R Textbook
+* R for Data Science (https://r4ds.had.co.nz/)
+* Advanced R (https://adv-r.hadley.nz/)
+
+#### Statistical Analysis in R
+* An Introduction to Statistical Learning: With Applications in R
+* Applied linear statistical models
+
+#### Visualization in R
+* R cheat sheet (https://www.rstudio.com/wp-content/uploads/2016/10/r-cheat-sheet-3.pdf)
+* ggplot2 cheat sheet (https://github.com/rstudio/cheatsheets/blob/master/data-visualization-2.1.pdf)
+* Google ggplot2 reference to to go the following website, https://ggplot2.tidyverse.org/reference/index.html
+* Stack Overflow with keywords, “R” or “ggplot2”
+* R for Data Science available at https://r4ds.had.co.nz/
+* The R Graphics Cookbook by Winston Chang
+
