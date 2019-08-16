@@ -10,7 +10,7 @@
 
 ## Reminder
 
-Each session contains R markdown files (basically a coding notebook), but of two version, the one with soluation, and the one that does not. To fully take advantage of this workshop, we recommand working on the R markdown files that do not have solutions first.
+Each session contains R markdown files (basically a coding notebook), but of two version, the one with solution, and the one that does not. To fully take advantage of this workshop, we recommand working on the R markdown files that do not have solutions first so as to evaluate yourself for your understanding of the materials.
 
 ## SESSION 1
 
