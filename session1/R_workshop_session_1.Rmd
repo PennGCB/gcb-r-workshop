@@ -141,8 +141,10 @@ Bottom line: if you have a code snippet that you think should be working but isn
 n <- c(3.4, 1.2, 5)   #numeric vector
 n
 f <- factor(n)        #converting the numbers into factors
+# f <- as.factor(n)   #you can also do the conversion using the as.factor function
 f
 as.numeric(f)         #converting the factors back to numbers
+typeof(f)             #check the data type of a variable
 ```
 
 Why did this happen? R stores your data (numeric or not) as integers, regardless of the order you entered them

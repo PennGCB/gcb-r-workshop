@@ -37,25 +37,42 @@ library(dplyr)
 library(RColorBrewer)
 
 # now use the command to see if you have successfully load ggplot2 in your environment
-ggplot()
+search() 
 ```
 
-## 3. Helpful functions in Rstudio
+## 3. Helpful functions or features in Rstudio
 
   1. Automatic filling using the 'Tab' key. 
-  2. **?function_name** to look up description and manual for a R function
-  3. **Command + Enter** in Mac and **Control + Enter** in Windows to execute the line of source code where the cursor currently resides
 
 ```{r helpful function, eval=FALSE, include=FALSE}
 # automatic filling
 # try to find the mean() function, which calculates the mean of input vectors, using the 'tab' key immediate folloing 'me'
 me
+```
 
+  2. **?function_name** to look up description and manual for a R function
+
+```{r helpful function, echo=TRUE}
 # manual lookup
 ?mean
+```
 
+  3. **Command + Enter** in Mac and **Control + Enter** in Windows to execute the line of source code where the cursor currently resides
+
+```{r helpful function, echo=TRUE}
 # try to execute the following code with the shortcut
 mean(c(1,2,3))
+```
+
+  4. **<-** and **=** are used interchangeably in R to assign values to a variable
+
+```{r helpful function, echo=TRUE}
+# assigning values using arror head
+mean1 <- mean(c(1,2,3))
+mean1
+# assigning value using the classic equal sign
+mean2 = mean(c(1,2,3))
+mean2
 ```
 
 
