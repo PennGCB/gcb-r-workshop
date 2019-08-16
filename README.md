@@ -1,18 +1,13 @@
 # GCB R workshop introduction
 
 
-## TO-DO
-
-+ [ ] Make initial todo-list, either here or in issues
-
-
 ## PREAMBLE
 
-+ [ ] Write up the instruction about what students need to do before the workshop
-+ [ ] Prepare a R markdown file with the following content
-  + [ ] Install R and Rstudio
-  + [ ] Install R packages necessary for this workshop
-  + [ ] Helpful materials and references of R, for example, ggplot2 cheatsheet and best practices in visualization
++ [ ] Instruction of preparation before the workshop
+> + [ ] Install R
+> + [ ] Install Rstudio
+> + [ ] Install required R packages for this workshop
+> + [ ] Helpful materials and references of R, for example, r cheatsheet, ggplot2 cheatsheet and best practices in visualization
 
 
 ## SESSION 1
