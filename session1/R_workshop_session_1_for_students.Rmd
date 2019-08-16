@@ -1,0 +1,572 @@
+---
+title: "GCB 533 R Workshop Session 1"
+author: "William Bone, Kaylyn Clark, and Derek Kelly"
+date: "8/14/2019"
+output: html_document
+---
+We borrowed code and ideas from swirl and https://www.statmethods.net/input/datatypes.html, Binglan Li, Matt Paul, and Shweta Ramdas
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In this section, we will be covering data types, including
+
+* Vectors (numeric logical, and character)
+* Lists
+* Matrices
+* Data Frames
+* Factors
+
+Some of these may be familiar from other programming languages, while others are more R-specific
+
+
+#Vectors
+
+Contain elements of the same type
+
+Building a vector: use the "concatenate" or "combine" function c()
+
+``` {r eval = TRUE}
+vector1 <- c(1, 5, 8.4, -6, 2)                  #Numeric
+vector2 <- c(TRUE, TRUE, FALSE, NA, FALSE)      #Logical
+vector3 <- c("first", "second", "third", "fourth", "fifth")        #Character
+```
+
+Vector1 contains integers and floats, but they are all considered of the numeric type by R
+
+* R typically forces ints to floats anyway
+
+Vector3 contains what we would usually consider "strings" in C++ or Java, but R considers them all part of the character class
+
+If you're ever unsure of what type of vector you have, use the class() function
+
+``` {r eval = TRUE}
+class(vector1)
+```
+
+Accessing vector elements - Indexing
+
+Refer to element(s) of a vector using subscripts enclosed in []
+
+NOTE: R uses 1-indexing
+
+``` {r eval = FALSE}
+vector1[3]
+vector1[c(2,4)]
+```
+
+#Lists
+
+Contain objects that can be of different types, including other lists/vectors; generic vector 
+
+Building a vector: use the list() function
+
+``` {r eval = TRUE}
+x <- list(vector1, vector2, vector3, 8)
+x
+```
+
+Working with Lists - Slicing vs. Referencing 
+
+Slicing, [] - Retrieve a list object or "slice" of the original list
+
+Reference, [[]] - Retrieve a list element, which can them be modified directly
+
+``` {r eval = TRUE}
+slice <- x[2]
+class(slice)
+
+ref <- x[[2]]
+class(ref)
+```
+
+#Matrices
+
+2-dimensional (rectangular) collecction of data of a single type, with all columns of equal length
+
+Made using the matrix() function
+
+R TIP: type ?[function name] to bring up the manual page for that function
+
+```{r eval = FALSE}
+?matrix
+```
+
+Based on the manual page, make a matrix called 'mymatrix' with the following parameters and then view it:
+
+``` {r eval = TRUE}
+data <- c(2, 4, 3, 1, 5, 7)
+rnames <- c("row1", "row2")
+cnames <- c("col1", "col2", "col3")
+```
+
+Now that we have a matrix, we can index by position or name using the format [row,col]
+
+``` {r eval = FALSE}
+mymatrix[2,3]
+mymatrix["row2", "col3"]
+mymatrix[1,]
+mymatrix[,2]
+```
+
+#Data Frames
+
+2-dimensional collection of data where different columns can contain different data types, generalized matrix
+
+Made using the data.frame() function
+
+``` {r eval = TRUE}
+df <- data.frame(vector1, vector2, vector3)
+df
+```
+
+We can then name the columns
+
+``` {r eval = TRUE}
+names(df) <- c("Numbers", "Passed?", "Order")
+df
+```
+
+#R Quirk: Factors
+
+R explanation : Factors are a data type used to represent categorical data. They look like characters/strings but are actually stored as integers, so they can't always be treated as strings (Ex. "Female" stored as 1, "Male" stored as 2)
+
+Bottom line: if you have a code snippet that you think should be working but isn't, check that the variable classes are what you expect
+
+Let's try to convert number to factors and then back again
+
+``` {r eval = FALSE}
+n <- c(3.4, 1.2, 5)   #numeric vector
+n
+f <- factor(n)        #converting the numbers into factors
+f
+as.numeric(f)         #converting the factors back to numbers
+```
+
+Why did this happen? R stores your data (numeric or not) as integers, regardless of the order you entered them
+
+To see the actual data you saved as factors, use the levels() function
+
+``` {r eval = FALSE}
+levels(f)
+```
+
+
+# Loading and Viewing data
+
+In research, data is often organized into a table of some kind, with columns corresponding to variables and rows corresponding to observations. For example, we may have a collection of demographic data (e.g. for each row, a state, its population, poverty and crime rates, land area, etc.), gene expression data (for each row, a gene ID, its genomic coordinates, and its expression across tissues), or electronic health records (you can imagine having rows for patients *or* individual hospital visits; what kinds of variables would you collect?). These data are generally stored in an external file, with a uniform delimiter separating columns, and must be loaded into R for analysis. Let's load data from the Framingham Heart Study, a study of BLANK:
+
+```{r eval=TRUE}
+fhs = read.delim("Framingham.dat")
+```
+
+After loading data, it's best to make sure everything went smoothly! We could simply print the dataframe to the console, but dataframe can have dozens, hundreds, or even millions of rows. Let's first find the dimensions of our table:
+
+```{r}
+dim(fhs)
+```
+
+It looks like our dataframe has 1407 rows and 1 column. Let's get a peak at the data, *without* printing it all to the console. To view the first few rows (default 6), we can use the `head` function (similarly, to view the last few rows we can use `tail`):
+
+```{r}
+head(fhs)
+tail(fhs)
+```
+
+It looks like our data was stored using commas, but `read.delim` assumes tabs; that's why R thinks we only have one column when we should really have 8. Let's use `read.csv` for "comma-separated-variables":
+
+```{r}
+
+```
+
+Much better! We have a table with 1407 rows and 8 columns, with column names:
+
+```{r}
+
+```
+
+We can get a quick view of the structure summary of our dataframe and a summary of the values in each column:
+
+```{r}
+str(fhs)
+summary(fhs)
+```
+
+We can see that we have 7 columns with integer values and one column with Factor values for "FEMALE" and "MALE." Note the count of `NA` in the `Heart.Disease`, `FRW`, and `CIG` columns. These represent missing data, which can cause problems when we want to analyze our data:
+
+```{r}
+mean(fhs$FRW)          # calculating the mean of a vector with any 'NA' values returns 'NA'
+
+```
+
+Let's see how many rows altogether contain a missing value:
+
+```{r}
+head(complete.cases(fhs)) 
+sum(complete.cases(fhs))  
+sum(!complete.cases(fhs)) 
+```
+
+the `complete.cases` function returns a logical value for each row: `TRUE` it is "complete" (i.e. has no missing values), and `FALSE` if it does contain a missing value. It looks like 1393 out of 1407 rows are complete. Because only 14 rows are missing we can probably throw them out without biasing our results too much:
+
+```{r}
+ # subset 'fhs', including only complete rows
+#summary(fhs.clean)
+#str(fhs.clean)
+```
+
+These display useful statistics of our variables, but we can explore them individually:
+
+```{r}
+#mean(fhs.clean$DBP)   # mean
+#median(fhs.clean$DBP) # median
+#min(fhs.clean$DBP)    # minimum
+#max(fhs.clean$DBP)    # maximum
+#var(fhs.clean$DBP)    # variance
+#sd(fhs.clean$DBP)     # standard deviation
+```
+
+Now that we have some nice clean data let's save it to file for later
+```{r}
+
+
+```
+
+## Visualization and Analysis
+
+It's also good data science practice to get a sense of the distribution of your variables. Let's plot a histogram of the diastolic and systolic blood pressure.
+
+```{r}
+#hist() # histogram of the diastolic blood pressure
+#hist() # histogram of the systolic blood pressure
+```
+
+We can also normalize these variables to have mean 0 and standard deviation 1 using `scale`:
+
+```{r}
+
+```
+
+We can plot the histogram of all numerical variables. To do this more elegantly we'll use `tidyr` and `ggplot`, which will be taught next lesson.
+
+```{r}
+
+library(tidyr)
+library(ggplot2)
+
+#fhs.clean %>%
+#  gather(key=variable, value=value, c(AGE, SBP, DBP, CHOL, FRW)) %>%
+#  ggplot(., aes(x=value)) +
+#  geom_histogram() +
+#  theme_classic(base_size=15) +
+#  facet_wrap(~ variable, scales="free_x")
+```
+
+Now that we have a sense of each individual variable, we can start comparing variables, say two continuous variables like diastolic vs systolic blood pressure:
+
+```{r}
+#plot()
+
+```
+
+We've created the same plot using two different methods: explicitly declaring the `x` and `y` variables, and using the syntax `SBP ~ DBP`, taking advantage of R's `formula`. This is commonly used in R's statistical tests and can be read as "compare the response variable on the left-hand-side (SBP) to the predictor variable on the right-hand-side (DBP)." You'll see this syntax often.
+
+# Continuous vs. Continuous
+
+Systolic and diastolic blood pressure look correlated! Let's measure the Pearson's correlation coefficient between them
+
+```{r}
+#cor(fhs.clean$DBP, fhs.clean$SBP)
+```
+
+Is this significant?
+
+```{r}
+#dbp_sbp.cor = cor.test(fhs.clean$DBP, fhs.clean$SBP)
+#dbp_sbp.cor
+```
+
+`2.2e-16` is the lowest p-value R generally displays; we can extract a more precise p-value since we saved the output of `cor.test`.
+
+```{r}
+#dbp_sbp.cor$p.value
+```
+
+
+# Continuous vs. Discrete
+
+We can also visualize a continuous variable against a discrete variable, say diastolic blood pressure by sex, using a boxplot.
+
+```{r}
+#boxplot()
+```
+
+These look quite similar, we can test if males have significantly different diastolic blood pressure than females using a t-test.
+
+```{r}
+#dbp_sex.t = t.test(DBP ~ SEX, fhs.clean)
+#dbp_sex.t
+#summary(dbp_sex.t)
+```
+
+We can see that R has returned several useful objects from our t-test, including the method (one-sided, two-sided, one-sample, two-sample), the estimate (means in each group), the confidence interval of the difference in mean, and the p-value:
+
+```{r}
+# dbp_sex.t$method
+# dbp_sex.t$estimate
+# dbp_sex.t$conf.int
+# dbp_sex.t$p.value
+```
+
+# Discrete vs. Discrete
+
+How about analyzing two discrete or categorial variables? Say we want to compare the rate of heart disease in males vs. females. We can use a contingency table.
+
+```{r}
+# hd_sex.tab = table(fhs.clean[,c("SEX","Heart.Disease.")])
+# hd_sex.tab
+```
+
+To test whether males and females have significantly different odds, ignoring other factors, we will use a Fisher's Exact Test.
+
+```{r}
+# hd_sex.ft = fisher.test(hd_sex.tab)
+# hd_sex.ft
+```
+
+## A real analysis using R
+
+Because our response variable `Heart.Disease.` is binary (you have it or you don't), normal linear regression doesn't make sense. We'll instead use the generalized linear model `glm` function to run logistic regression.
+
+```{r}
+
+# fhs.glm = glm(Heart.Disease. ~ .,
+#               data = fhs.clean,
+#               family="binomial")
+# 
+# summary(fhs.glm)
+
+```
+
+Notice our use of the formula `Heart.Disease ~ .`: this tells R to regression `Heart.Disease.` against all other variables. Using our logistic regression approach, we find that Age, maleness, systolic (but *not* diastolic) blood pressure, cholesterol, and cigarettes are all significantly and independently associated with heart disease risk. These results are ready to go into a paper, and all with a one or two lines of code! Hopefully this highlights the power of R.
+
+
+# What are functions?
+
+* A function is essentially a piece of resuable code, that normally has a name.
+
+* We have already used several functions today, for example mean(), dim(), and head()
+
+
+
+* The basic syntax of a function looks like this:
+
+```{r eval=FALSE}
+function_name <- function(arg) {
+  #do something
+}
+
+```
+
+## Let's write a function!
+* We will start off by writing our own "mean()" function
+
+
+```{r eval=TRUE}
+
+```
+
+* Time to test your mean function on the vector c(2,5,6,7):
+
+```{r eval=TRUE}
+
+```
+
+
+* What happens when we give mean2 a list?
+* try: numList <- list(2,5,6,7)
+
+```{r eval=TRUE}
+
+```
+
+* We can take a look at any functions we have loaded into our workspace by typing "function_name".
+
+* Let's take a look at one we are already familiar with:
+
+
+```{r eval=TRUE}
+
+```
+
+## How do I save a function?
+* One of the useful things about functions is that they can be saved and used later.
+* By saving the function in a "my_function.R" file you can run these functions just like you would run any built in function
+#### WARNING NEED TO KEEP AN EYE ON WHAT YOUR WORKING DIRECTORY IS!
+
+
+* If you find that you are using the same arguments frequently then you can give your arguments default parameters by using
+
+```{r eval=FALSE}
+my_function <- function(arg=default){
+  
+  #do something
+  
+}
+
+```
+
+
+* Let's write a function that uses a default argument! 
+* Write a function called addSumNumbers, that adds two numbers, but by default adds 1 to a number that has no default
+* Then run addSumNumbers using 5 and the default.
+
+```{r eval=TRUE}
+
+```
+
+* You can switch the order of the arguments if you name thing. Let's try this using a new function, divideSumNumbers
+
+```{r eval=TRUE}
+
+```
+
+* R can also autocomplete your argument names.
+* Try "print(divideSumNumbers(numT=1,numO=5))"
+
+```{r eval=TRUE}
+
+```
+
+* I recommend being careful with this functionality, because it can make your code a bit trickier to read.
+
+## Useful Function Tricks
+* You can have a function be an argumenent in a second function
+* lets give this a shot by writing a function called "evaluate" that has the arguments "a function you want to run"(like mean() or sum()) and a vector of numbers
+```{r eval=TRUE}
+
+```
+
+* Now test evalute using by taking the sum of the vector c(2,4,6)
+
+```{r eval=TRUE}
+
+
+
+```
+
+## Anonymous Functions
+
+* A function does not need to have a name, if you just want to declare a function and not name it, it is called a "anonymous fucntion"
+
+* Here is an example
+```{r eval=FALSE}
+function(x){x+1}
+```
+
+* These can be particularly handy in a loop (Which we will talk about shortly), but for now lets try a few things using our evaluate function.
+
+* use evaluate and an anomyous function to add 1 to the number 5
+```{r eval=TRUE}
+
+```
+
+* use evaluate and an anomyous function to return the last item in this vector c(2,4,6)
+```{r eval=TRUE}
+
+```
+
+# LOOPS!
+* Loops are handy when you want to iterate over the individual units in something.
+* For example: entries in a list, columns in a dataframe, or numbers in a vector
+
+#### Disclaimer: Should vectorize when possible, but that is another topic for another day.
+
+# BACK TO LOOPS!
+
+*You saw before that to find the data type for each element in a data vector we had to write out the same command for each element. To perform the same command over each element we can use loops. 
+
+*Basic for loop:
+
+```{r eval=TRUE}
+
+```
+
+
+* For Loops are useful, but R has an even more compact way over looping over elements that also have some handy features when you are coding via the *apply family of functions, apply, sapply, and lapply (there are other but we'll focus on these here)
+
+## Apply function
+* Apply is great for iterating a function over an object, such as a dataframe or a matrix
+
+* The basic anatomy of an apply command is:
+```{r eval=FALSE}
+apply(object, direction, function)
+
+```
+* Where the direction is either 1 (for iterate over the rows) or 2 for iterate over columns
+
+Let's try this out using the Framingham data set. First, Let's find out what class each column of the dataframe is.
+
+```{r eval=TRUE}
+
+
+```
+
+Now, let's try using apply on a single column of our data. Let's use apply to calculate each individual's distance from the mean for their SBP
+```{r eval=TRUE}
+
+
+```
+
+##lappy
+
+* There are variations on apply that are nice for knowing exactly what kind of object will come out the other end a good example is lappy. lappy works a lot like apply, but it returns the output in the form of a list.
+
+* Try using lappy() to look at the classes of the different columns in the Framingham data.
+
+```{r eval=TRUE}
+
+```
+
+## sapply
+
+* sapply is similar to lapply, where the "s" is for "simple". It will attempt to simplify the output of your loop as far as it can, so for example instead of returning a list (lappy) it will return a vector.
+
+*Lets do the same command we did with lappy using sapply
+
+```{r eval=TRUE}
+
+
+```
+
+* Sapply can be handy for looking at basic stats for multiple columns in a dataframe. As example use sapply to get the range of the last 4 columns of the Framingham data.
+* What kind of object do you think it will output?
+
+```{r eval=TRUE}
+
+
+
+```
+
+## vapply
+
+* vapply is again similar to apply, but it requires you to designate what you expect the output object to be, and if the output is not what you expect it will throw an error. This can be particularly handy if you are writing a script.
+
+* Let's try to use vapply to get a character vector of the column classes
+```{r eval=TRUE}
+
+
+```
+
+## tapply
+
+* tapply works similar to table, but allows you to apply a function of each "factor" in the column you are "tabling"
+
+* To try out tapply find the range, median, and mean of the male and female SBPs.
+```{r eval=TRUE}
+
+
+```
+
+
