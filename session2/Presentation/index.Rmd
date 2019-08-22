@@ -104,18 +104,41 @@ that you can perceive."
 Adapted from <https://blog.rstudio.com/2014/01/17/introducing-dplyr/>
 ]
 
-???
-
-TODO: show function to add stars corresponding to custom p-values
-
 ---
 
-# TODO
+# What is the *tidyverse*?
+
+.font150[
+"The tidyverse is an opinionated .hl[collection of R packages] designed for
+data science. All packages have an underlying design
+[philosophy](https://www.jstatsoft.org/article/view/v059i10), grammar,
+and data structures" ([tidyverse.org](https://tidyverse.org))
+]
+
+.left-column[
+![](images/tidy.png)
+]
+
+.right-column[.font120[
+* `tidyr`: clean and reshape your data
+* `readr`: better file parsing
+* `tibble`: better data frames
+* `purrr`: better functional programming
+* ... and many more (i.e. `broom`)...
+]]
+
+.footnote[
+Incredibly accessible and deep online textbook:
+[R for Data Science](https://r4ds.had.co.nz)
+]
 
 ???
 
-Last slide before going into ggplot2 and dplyr
-Would like to show flow from original data to tidy/transformed data to plotting
+So why should you learn tidyverse? Basically shared design philosophy means
+that adopting tools within the tidyverse becomes easier and easier. Things fail
+consistently and there are less silent errors due to weird R type stuff. It's
+expressive and allow you to think more about what you want to do instead of how
+you are going to do it.
 
 ---
 layout: false
@@ -387,7 +410,8 @@ knitr::kable(messy_pop, format = 'html')
 --
 
 .right-column[
-```{r tidy-tidy1, result='asis', echo=-2}
+```{r tidy-tidy1, result='asis', echo=1:2}
+# NOTE: using `tidyr` here, pivoting "longer"
 tidy_pop <- gather(messy_pop, 'year', 'pop', -country)
 as_table(tidy_pop)
 ```
@@ -479,7 +503,7 @@ minimal_theme <- theme_bw() +
   )
 
 set.seed(4242)
-df_geom <- data_frame(y = rnorm(10), x = 1:10)
+df_geom <- tibble(y = rnorm(10), x = 1:10)
 
 g_geom <- list()
 g_geom$point <- ggplot(df_geom, aes(x, y)) + geom_point() + ggtitle("geom_point()")
@@ -919,6 +943,10 @@ Huge number of parameters, grouped by plot area:
 - `plot`: Whole image
 - `strip`: Facet labels
 ]
+
+Check out3
+[emilyriederer/ugliest-ggplot-theme.R](https://gist.github.com/emilyriederer/2bf4f67d7e198f8359b61706c82e42ee)!
+
 ---
 
 .right-column[
@@ -928,6 +956,7 @@ Theme options are supported by helper functions:
 - `element_line()`
 - `element_rect()`
 - `element_text()`
+
 ]
 
 ---
@@ -1007,1265 +1036,355 @@ class: fullscreen, inverse, top, left, text-white
 background-image: url(images/super-grover.jpg)
 
 .font200[You have the power!]
----
-
-class: inverse, center, middle
-
-# "Live" Coding
-
-```{r}
-library(gapminder)
-```
-
-```{r reset_theme, include=FALSE}
-theme_set(theme_gray())
-```
-
----
-# head(gapminder)
-
-```{r head-gapminder, echo=FALSE}
-head(gapminder)
-```
-
----
-# glimpse(gapminder)
-
-```{r summary-gapminder, echo=FALSE, comment=""}
-glimpse(gapminder)
-```
-
---
-
-Let's start with `lifeExp` vs `gdpPercap`
-
----
-class: fullscreen
-layout: true
----
-
-.left-code[
-```{r gapminder-le-gdp-1, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = gdpPercap,
-      y = lifeExp)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-gdp-1", "png")`)
-]
-
---
-
-Add points...
-
----
-
-.left-code[
-```{r gapminder-le-gdp-2, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = gdpPercap,
-      y = lifeExp) +
-  geom_point() #<<
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-gdp-2", "png")`)
-]
-
---
-
-How can I tell countries apart?
-
----
-
-.left-code[
-```{r gapminder-le-gdp-3, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = gdpPercap,
-      y = lifeExp,
-      color = continent) + #<<
-  geom_point()
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-gdp-3", "png")`)
-]
-
---
-
-GDP is squished together on the left
-
----
-
-.left-code[
-```{r gapminder-le-gdp-4, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = gdpPercap,
-      y = lifeExp,
-      color = continent) +
-  geom_point() +
-  scale_x_log10() #<<
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-gdp-4", "png")`)
-]
-
---
-
-Still lots of overlap in the countries...
-
----
-
-.left-code[
-```{r gapminder-le-gdp-5, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = gdpPercap,
-      y = lifeExp,
-      color = continent) +
-  geom_point() +
-  scale_x_log10() +
-  facet_wrap(~ continent) + #<<
-  guides(color = FALSE)     #<<
-```
-
-No need for color legend thanks to facet titles
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-gdp-5", "png")`)
-]
-
---
-
-Lots of overplotting due to point size
-
----
-
-.left-code[
-```{r gapminder-le-gdp-6, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = gdpPercap,
-      y = lifeExp,
-      color = continent) +
-  geom_point(size = 0.25) + #<<
-  scale_x_log10() +
-  facet_wrap(~ continent) +
-  guides(color = FALSE)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-gdp-6", "png")`)
-]
-
---
-
-Is there a trend?
-
----
-
-.left-code[
-```{r gapminder-le-gdp-7, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = gdpPercap,
-      y = lifeExp,
-      color = continent) +
-  geom_line() + #<<
-  geom_point(size = 0.25) +
-  scale_x_log10() +
-  facet_wrap(~ continent) +
-  guides(color = FALSE)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-gdp-7", "png")`)
-]
-
---
-
-Okay, that line just connected all of the points sequentially...
-
----
-
-.left-code[
-```{r gapminder-le-gdp-8, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = gdpPercap,
-      y = lifeExp,
-      color = continent) +
-  geom_line(
-    aes(group = country) #<<
-  ) +
-  geom_point(size = 0.25) +
-  scale_x_log10() +
-  facet_wrap(~ continent) +
-  guides(color = FALSE)
-```
-
-.font200.center[&#x1F914;]
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-gdp-8", "png")`)
-]
-
---
-
-&#x1F4A1; We need time on x-axis!
-
----
-
-.left-code[
-```{r gapminder-gdp-year-1, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = year, #<<
-      y = gdpPercap, #<<
-      color = continent) +
-  geom_line(
-    aes(group = country)
-  ) +
-  geom_point(size = 0.25) +
-  scale_y_log10() + #<<
-  facet_wrap(~ continent) +
-  guides(color = FALSE)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-gdp-year-1", "png")`)
-]
-
---
-
-Can't see x-axis labels, though
-
----
-
-.left-code[
-```{r gapminder-gdp-year-2, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = year,
-      y = gdpPercap,
-      color = continent) +
-  geom_line(
-    aes(group = country)
-  ) +
-  geom_point(size = 0.25) +
-  scale_y_log10() +
-  scale_x_continuous(breaks = #<<
-    seq(1950, 2000, 25) #<<
-  ) +                            #<<
-  facet_wrap(~ continent) +
-  guides(color = FALSE)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-gdp-year-2", "png")`)
-]
-
---
-
-What about life expectancy?
-
----
-
-.left-code[
-```{r gapminder-le-year-1, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = year, 
-      y = lifeExp, #<<
-      color = continent) +
-  geom_line(
-    aes(group = country)
-  ) +
-  geom_point(size = 0.25) +
-  #scale_y_log10() + #<<
-  scale_x_continuous(breaks = 
-    seq(1950, 2000, 25)
-  ) +  
-  facet_wrap(~ continent) +
-  guides(color = FALSE)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-year-1", "png")`)
-]
-
---
-
-Okay, let's add a trend line
-
----
-
-.left-code[
-```{r gapminder-le-year-2, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = year, 
-      y = lifeExp,
-      color = continent) +
-  geom_line(
-    aes(group = country)
-  ) +
-  geom_point(size = 0.25) +
-  geom_smooth() + #<<
-  scale_x_continuous(breaks = 
-    seq(1950, 2000, 25)
-  ) +  
-  facet_wrap(~ continent) +
-  guides(color = FALSE)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-year-2", "png")`)
-]
-
---
-
-De-emphasize individual countries
-
----
-
-.left-code[
-```{r gapminder-le-year-3, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = year, 
-      y = lifeExp,
-      color = continent) +
-  geom_line(
-    aes(group = country),
-    color = "grey75" #<<
-  ) +
-  geom_point(size = 0.25) +
-  geom_smooth() + 
-  scale_x_continuous(breaks = 
-    seq(1950, 2000, 25)
-  ) +  
-  facet_wrap(~ continent) +
-  guides(color = FALSE)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-year-3", "png")`)
-]
-
---
-
-Points are still in the way
-
----
-
-.left-code[
-```{r gapminder-le-year-4, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = year, 
-      y = lifeExp,
-      color = continent) +
-  geom_line(
-    aes(group = country),
-    color = "grey75"
-  ) +
-  #geom_point(size = 0.25) + #<<
-  geom_smooth() + 
-  scale_x_continuous(breaks = 
-    seq(1950, 2000, 25)
-  ) +  
-  facet_wrap(~ continent) +
-  guides(color = FALSE)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-year-4", "png")`)
-]
-
---
-
-Let's compare continents
-
----
-
-.left-code[
-```{r gapminder-le-year-5, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = year, 
-      y = lifeExp,
-      color = continent) +
-  geom_line(
-    aes(group = country),
-    color = "grey75"
-  ) +
-  geom_smooth() + 
-  # scale_x_continuous(
-  #   breaks = 
-  #     seq(1950, 2000, 25)
-  # ) +  
-  # facet_wrap(~ continent) + #<<
-  guides(color = FALSE)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-year-5", "png")`)
-]
-
---
-
-Wait, what color is each continent?
-
----
-
-.left-code[
-```{r gapminder-le-year-6, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = year, 
-      y = lifeExp,
-      color = continent) +
-  geom_line(
-    aes(group = country),
-    color = "grey75"
-  ) +
-  geom_smooth() + 
-  theme( #<<
-  legend.position = "bottom" #<<
-  ) #<<
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-year-6", "png")`)
-]
-
---
-
-Let's try the minimal theme
-
----
-
-.left-code[
-```{r gapminder-le-year-7, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = year, 
-      y = lifeExp,
-      color = continent) +
-  geom_line(
-    aes(group = country),
-    color = "grey75"
-  ) +
-  geom_smooth() + 
-  theme_minimal() + #<<
-  theme(
-  legend.position = "bottom"
-  )
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-year-7", "png")`)
-]
-
---
-
-Fonts are kind of big
-
----
-
-.left-code[
-```{r gapminder-le-year-8, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = year, 
-      y = lifeExp,
-      color = continent) +
-  geom_line(
-    aes(group = country),
-    color = "grey75"
-  ) +
-  geom_smooth() + 
-  theme_minimal( 
-    base_size = 8) + #<<
-  theme(
-  legend.position = "bottom"
-  )
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-le-year-8", "png")`)
-]
-
---
-
-Cool, let's switch gears
-
----
-
-.left-code[
-```{r gapminder-americas-data, fig.show="hide"}
-americas <- 
-  gapminder %>% 
-  filter(
-    country %in% c(
-      "United States",
-      "Canada",
-      "Mexico",
-      "Ecuador"
-    )
-  )
-```
-
-Let's look at four countries in more detail. How do their populations compare to each other?
-]
-
-.right-plot[
-<!-- ![](`r knitr::fig_chunk("gapminder-le-year-8", "png")`) -->
-```{r echo=FALSE}
-americas
-```
-]
-
----
-
-.left-code[
-```{r gapminder-americas-1, fig.show="hide"}
-ggplot(americas) +
-  aes(
-    x = year,
-    y = pop
-  ) +
-  geom_col()
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-americas-1", "png")`)
-]
-
---
-
-Yeah, but how many people are in each country?
-
----
-
-.left-code[
-```{r gapminder-americas-2, fig.show="hide"}
-ggplot(americas) +
-  aes(
-    x = year,
-    y = pop,
-    fill = country #<<
-  ) +
-  geom_col()
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-americas-2", "png")`)
-]
-
---
-
-Bars are "stacked", can we separate?
-
----
-
-.left-code[
-```{r gapminder-americas-3, fig.show="hide"}
-ggplot(americas) +
-  aes(
-    x = year,
-    y = pop,
-    fill = country
-  ) +
-  geom_col(
-    position = "dodge" #<<
-  )
-```
-
-`position = "dodge"` places objects _next to each other_ instead of overlapping
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-americas-3", "png")`)
-]
-
---
-
-&#x1F913; What is scientific notation anyway?
-
----
-
-.left-code[
-```{r gapminder-americas-4, fig.show="hide"}
-ggplot(americas) +
-  aes(
-    x = year,
-    y = pop / 10^6, #<<
-    fill = country
-  ) +
-  geom_col(
-    position = "dodge" 
-  )
-```
-
-ggplot aesthetics can take expressions!
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-americas-4", "png")`)
-]
-
---
-
-Might be easier to see countries individually
-
----
-
-.left-code[
-```{r gapminder-americas-5, fig.show="hide"}
-ggplot(americas) +
-  aes(
-    x = year,
-    y = pop / 10^6,
-    fill = country
-  ) +
-  geom_col(
-    position = "dodge" 
-  ) +
-  facet_wrap(~ country) + #<<
-  guides(fill = FALSE) #<<
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-americas-5", "png")`)
-]
-
---
-
-Let range of y-axis vary in each plot
-
----
-
-.left-code[
-```{r gapminder-americas-6, fig.show="hide"}
-ggplot(americas) +
-  aes(
-    x = year,
-    y = pop / 10^6,
-    fill = country
-  ) +
-  geom_col(
-    position = "dodge" 
-  ) +
-  facet_wrap(~ country,
-    scales = "free_y") + #<<
-  guides(fill = FALSE)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-americas-6", "png")`)
-]
-
---
-
-What about life expectancy again?
-
----
-
-.left-code[
-```{r gapminder-americas-7, fig.show="hide"}
-ggplot(americas) +
-  aes(
-    x = year,
-    y = lifeExp, #<<
-    fill = country
-  ) +
-  geom_col(
-    position = "dodge" 
-  ) +
-  facet_wrap(~ country,
-    scales = "free_y") +
-  guides(fill = FALSE)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-americas-7", "png")`)
-]
-
---
-
-This should really be &#x1F4C8; instead of &#x1F4CA;
-
----
-
-.left-code[
-```{r gapminder-americas-8, fig.show="hide"}
-ggplot(americas) +
-  aes(
-    x = year,
-    y = lifeExp,
-    fill = country
-  ) +
-  geom_line() + #<<
-  facet_wrap(~ country,
-    scales = "free_y") +
-  guides(fill = FALSE)
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-americas-8", "png")`)
-]
-
---
-
-&#x1F4CA; are **fill**ed, &#x1F4C8; are **color**ed
-
----
-
-.left-code[
-```{r gapminder-americas-9, fig.show="hide"}
-ggplot(americas) +
-  aes(
-    x = year,
-    y = lifeExp,
-    color = country #<<
-  ) +
-  geom_line() +
-  facet_wrap(~ country,
-    scales = "free_y") +
-  guides(color = FALSE) #<<
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-americas-9", "png")`)
-]
-
---
-
-Altogether now!
-
----
-
-.left-code[
-```{r gapminder-americas-10, fig.show="hide"}
-ggplot(americas) +
-  aes(
-    x = year,
-    y = lifeExp,
-    color = country
-  ) +
-  geom_line()
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-americas-10", "png")`)
-]
-
---
-
-Okay, changing gears again. What is range of life expectancy in Americas?
-
----
-
-.left-code[
-```{r gapminder-all-americas-1, fig.show="hide"}
-gapminder %>% 
-  filter(
-    continent == "Americas"
-  ) %>% #<<
-  ggplot() + #<<
-  aes(
-    x = year,
-    y = lifeExp
-  )
-```
-
-You can pipe into `ggplot()`!  
-Just watch for `%>%` changing to `+`
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-all-americas-1", "png")`)
-]
-
---
-
-Boxplot for life expectancy range
-
----
-
-.left-code[
-```{r gapminder-all-americas-2, fig.show="hide"}
-gapminder %>% 
-  filter(
-    continent == "Americas"
-  ) %>%
-  ggplot() +
-  aes(
-    x = year,
-    y = lifeExp
-  ) +
-  geom_boxplot() #<<
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-all-americas-2", "png")`)
-]
-
---
-
-Why not boxplots by year?
-
----
-
-.left-code[
-```{r gapminder-all-americas-3, fig.show="hide"}
-gapminder %>% 
-  filter(
-    continent == "Americas"
-  ) %>%
-  mutate( #<<
-    year = factor(year) #<<
-  ) %>%  #<<
-  ggplot() +
-  aes(
-    x = year,
-    y = lifeExp
-  ) +
-  geom_boxplot()
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-all-americas-3", "png")`)
-]
-
---
-
-OK, what about global life expectancy?
-
----
-
-.left-code[
-```{r gapminder-all-americas-4, fig.show="hide"}
-gapminder %>% 
-  # filter(
-  #   continent == "Americas"
-  # ) %>%
-  mutate(
-    year = factor(year)
-  ) %>% 
-  ggplot() +
-  aes(
-    x = year,
-    y = lifeExp
-  ) +
-  geom_boxplot()
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-all-americas-4", "png")`)
-]
-
---
-
-Can we have cute little boxplots for each continent?
-
----
-
-.left-code[
-```{r gapminder-all-americas-5, fig.show="hide"}
-gapminder %>% 
-  mutate(
-    year = factor(year)
-  ) %>% 
-  ggplot() +
-  aes(
-    x = year,
-    y = lifeExp,
-    fill = continent #<<
-  ) +
-  geom_boxplot()
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-all-americas-5", "png")`)
-]
-
---
-
-Hard to read years, let's rotate &#x1F504;
-
----
-
-.left-code[
-```{r gapminder-all-americas-6, fig.show="hide"}
-gapminder %>% 
-  mutate(
-    year = factor(year)
-  ) %>% 
-  ggplot() +
-  aes(
-    x = year,
-    y = lifeExp,
-    fill = continent
-  ) +
-  geom_boxplot() +
-  coord_flip() #<<
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-all-americas-6", "png")`)
-]
-
---
-
-Use `dplyr` to group by decade
-
----
-
-.left-code[
-```{r gapminder-all-americas-7, fig.show="hide"}
-gapminder %>% 
-  mutate(
-    decade = floor(year / 10), #<<
-    decade = decade * 10,      #<<
-    decade = factor(decade)      #<<
-  ) %>% 
-  ggplot() +
-  aes(
-    x = decade, #<<
-    y = lifeExp,
-    fill = continent
-  ) +
-  geom_boxplot() +
-  coord_flip()
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-all-americas-7", "png")`)
-]
-
---
-
-Let's hide Oceania, sorry &#x1F1E6;&#x1F1FA;&#x1F1F3;&#x1F1FF;&#x1F1EE;&#x1F1E9;&#x1F1EB;&#x1F1EF;&#x1F1F5;&#x1F1EC;
-
----
-
-.left-code[
-```{r gapminder-all-americas-8, fig.show="hide", echo=1}
-g <- gapminder %>% 
-  filter( #<<
-    continent != "Oceania" #<<
-  ) %>% #<<
-  mutate(
-    decade = floor(year / 10) * 10, decade = factor(decade)      
-  ) %>% 
-  ggplot() +
-  aes(
-    x = decade,
-    y = lifeExp,
-    fill = continent
-  ) +
-  geom_boxplot() +
-  coord_flip()
-
-g
-```
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-all-americas-8", "png")`)
-]
-
----
-
-.left-code[
-```{r gapminder-all-americas-9, fig.show="hide", echo=1}
-g +
-  theme_minimal(8) +
-  labs(
-    y = "Life Expectancy",
-    x = "Decade",
-    fill = NULL,
-    title = "Life Expectancy by Continent and Decade",
-    caption = "gapminder.org"
-  )
-```
-
-Note `x` and `y` are _original_ aesthetics, `coord_flip()` happens _after_.  
-
-Remove labels by setting `= NULL`.
-]
-
-.right-plot[
-![](`r knitr::fig_chunk("gapminder-all-americas-9", "png")`)
-]
 
 ---
 layout: false
-class: inverse, center, middle
+class: inverse center middle text-white
 
-# Level up
+.font200[Getting started with dplyr]
 
-```r
-Inspired by "The Best Stats You've Ever Seen" by Hans Rosling
-
-http://www.ted.com/talks/hans_rosling_shows_the_best_stats_you_ve_ever_seen
-```
-
----
-# Create the initial layout
-
-```{r hans-rosling-1, echo=1, out.height="99%", fig.width=16, fig.height=8, fig.show="hide"}
-g_hr <- 
-  ggplot(gapminder) +
-  aes(x = gdpPercap, y = lifeExp, size = pop, color = country) +
-  geom_point() +
-  facet_wrap(~year)
-g_hr
-```
-
-.plot-callout[
-![](`r knitr::fig_chunk("hans-rosling-1", "png")`)
+.footnote[
+Inspired by
+[dplyr slides](https://therbootcamp.github.io/BaselRBootcamp_2018April/_sessions/D2S1_Wrangling/Wrangling.html)
 ]
 
 ---
-# Hide the guides
 
-```{r hans-rosling-1a, echo=1, out.height="99%", fig.width=16, fig.height=8, fig.show="hide"}
-g_hr <- 
-  ggplot(gapminder) +
-  aes(x = gdpPercap, y = lifeExp, size = pop, color = country) +
-  geom_point() +
-  facet_wrap(~year) +
-  guides(color = FALSE, size = FALSE)
-g_hr
-```
+# What is *dplyr*?
 
-.plot-callout[
-![](`r knitr::fig_chunk("hans-rosling-1a", "png")`)
+.pull-left[
+.font150[
+.hl[dplyr] combines:
 ]
 
----
-# Adjust scales of x-axis, color, and size
-
-```{r hans-rosling-2, echo=1, out.height="99%", fig.width=16, fig.height=8, fig.show="hide"}
-g_hr <- 
-  g_hr +
-  scale_x_log10(breaks = c(10^3, 10^4, 10^5), labels = c("1k", "10k", "100k")) +
-  scale_color_manual(values = gapminder::country_colors) +
-  scale_size(range = c(0.5, 12))
-  
-g_hr
-```
-
-.plot-callout[
-![](`r knitr::fig_chunk("hans-rosling-2", "png")`)
+.font140[
+1. .hl[tables]
+2. .hl[verbs] that .hl[do] things to tables
+3. .hl[pipes] that string together tables and verbs
 ]
 
----
-# Tweak Anotations
-
-<br><br>
-
-```{r hans-rosling-3, echo=1, out.height="99%", fig.width=16, fig.height=8, fig.show="hide"}
-g_hr <- 
-  g_hr +
-  labs(
-    x = "GDP per capita",
-    y = "Life Expectancy"
-  ) +
-  theme_minimal(base_family = "Fira Sans") +
-  theme(
-    strip.text = element_text(size = 16, face = "bold"),
-    panel.border = element_rect(fill = NA, color = "grey40"),
-    panel.grid.minor = element_blank()
-  )
-g_hr
-```
-
-.plot-callout.top-right[
-![](`r knitr::fig_chunk("hans-rosling-3", "png")`)
-]
-
----
-# The final code and plot
-
-.font70[
-```{r hans-rosling-final, fig.width=16, fig.height=9, fig.show="hide"}
-ggplot(gapminder) +
-  aes(x = gdpPercap, y = lifeExp, size = pop, color = country) +
-  geom_point() +
-  facet_wrap(~year) +
-  guides(color = FALSE, size = FALSE) +
-  scale_x_log10(
-    breaks = c(10^3, 10^4, 10^5), 
-    labels = c("1k", "10k", "100k")) +
-  scale_color_manual(values = gapminder::country_colors) +
-  scale_size(range = c(0.5, 12)) +
-  labs(
-    x = "GDP per capita",
-    y = "Life Expectancy") +
-  theme_minimal(14, base_family = "Fira Sans") +
-  theme(
-    strip.text = element_text(size = 16, face = "bold"),
-    panel.border = element_rect(fill = NA, color = "grey40"),
-    panel.grid.minor = element_blank())
-```
-]
-
----
-class: fullscreen
-background-image: url(`r knitr::fig_chunk("hans-rosling-final", "png")`)
-background-size: cover
-
----
-# Special Bonus: Animated!
-
-.left-code[
-```{r include=FALSE}
-library(gganimate)
-g_hra <- 
-  ggplot(gapminder) +
-  aes(x = gdpPercap, y = lifeExp, size = pop, color = country) +
-  geom_point() +
-  guides(color = FALSE, size = FALSE) +
-  scale_x_log10(
-    breaks = c(10^3, 10^4, 10^5), 
-    labels = c("1k", "10k", "100k")) +
-  scale_color_manual(values = gapminder::country_colors) +
-  scale_size(range = c(0.5, 12)) +
-  labs(
-    x = "GDP per capita",
-    y = "Life Expectancy") +
-  theme_minimal(18, base_family = "Fira Sans") +
-  theme(
-    plot.background = element_rect("#FAFAFA", color = NA),
-    strip.text = element_text(size = 16, face = "bold"),
-    panel.border = element_rect(fill = NA, color = "grey40"),
-    panel.grid.minor = element_blank(),
-    plot.title = element_text(hjust = 0.5)
-  ) + 
-  transition_states(
-    year, 1, 0
-  ) + 
-  ggtitle("{closest_state}")
-
-anim_save("images/hans-rosling-esque.gif", 
-          animate(g_hra, width = 700, height = 500))
-```
-
-.font70[
-```{r hans-rosling-animated, eval=FALSE}
-# library(devtools)
-# install_github("thomasp85/gganimate")
-library(gganimate)
-
-# Same plot without facet_wrap()
-g_hra + 
-  transition_states(year, 1, 0) + 
-  ggtitle("{closest_state}")
-```
+.font150[
+Most tasks can be written as a sequence of simple verbs.
 ]
 ]
 
 --
 
-.right-plot[
-![](images/hans-rosling-esque.gif)
+.pull-right[
+## The pipe %>%
+
+I want to apply `A`, `B`, then `C` on `df`.
+
+{{content}}
 ]
 
+--
 
----
-layout: false
-class: inverse, middle, center
+### without pipes
 
-# g is for Goodbye
+```{r dplyr-without-pipes, eval=FALSE}
+C(B(A(df)))  # like, please don't.
+```
+
+{{content}}
+
+--
+
+### with pipes
+
+```{r dplyr-with-pipes, eval=FALSE}
+df %>%  # start with df
+  A() %>%  # then apply A
+  B() %>%  # then apply B
+  C()  # then apply C
+```
+
 ---
 layout: true
-# Stack Exchange is Awesome
+# Single-table verbs
 ---
 
-![](images/stack-exchange-search.png)
+.font130[
+Most comon set of verbs:
+
++ `mutate()`: new variables as functions of existing variables
++ `select()`: select subset of variables (columns)
++ `filter()`: select subset of observations (rows)
++ `arrange()`: reorder observations
++ `summarize()`: reduce multiple observations to single summary
+]
+
+--
+
+.font130[
+Combine with `group_by()` which allows performing operations "by group"
+]
 
 ---
 
-<img src="images/stack-exchange-answer.png" style="max-height: 100%">
+.right-column[
+```{r dplyr-before-anything, echo=FALSE}
+as_table(messy_pop)
+```
+.center[
+Examples operating on the table `messy_pop`...
+]
+]
+
+---
+
+.left-column[
+### Mutate
+```{r sidebar-mutate, eval=FALSE}
+mutate(...) #<<
+```
+]
+
+.column-right[
+```{r dplyr-before-mutate, echo=FALSE}
+as_table(messy_pop)
+```
+```{r dplyr-after-mutate-echo, eval=FALSE}
+messy_pop %>%
+  mutate(average=(`1997` + `2002` + `2007`) / 3)  #<<
+```
+```{r dplyr-after-mutate-eval, echo=FALSE}
+messy_pop %>%
+  mutate(average=(`1997` + `2002` + `2007`) / 3) %>%
+  as_table()
+```
+]
+
+
+
+---
+
+.left-column[
+### Mutate
+### Select
+```{r sidebar-select, eval=FALSE}
+select(...) #<<
+```
+]
+.column-right[
+```{r dplyr-before-select, echo=FALSE}
+as_table(messy_pop)
+```
+```{r dplyr-after-select-echo, eval=FALSE}
+messy_pop %>%
+  select(`1997`, `2007`)  #<<
+```
+```{r dplyr-after-select-eval, echo=FALSE}
+messy_pop %>% select(`1997`, `2007`) %>%
+  as_table()
+```
+]
+---
+
+.left-column[
+### Mutate
+### Select
+### Filter
+```{r sidebar-filter, eval=FALSE}
+filter(...) #<<
+```
+]
+.column-right[
+```{r dplyr-before-filter, echo=FALSE}
+as_table(messy_pop)
+```
+```{r dplyr-after-filter-echo, eval=FALSE}
+messy_pop %>%
+  filter(`2002` < 500)  #<<
+```
+```{r dplyr-after-filter-eval, echo=FALSE}
+messy_pop %>%
+  filter(`2002` < 500) %>%
+  as_table()
+```
+]
+---
+
+.left-column[
+### Mutate
+### Select
+### Filter
+### Arrange
+```{r sidebar-arrange, eval=FALSE}
+arrange(...) #<<
+```
+]
+.column-right[
+```{r dplyr-before-arrange, echo=FALSE}
+as_table(messy_pop)
+```
+```{r dplyr-after-arrange-echo, eval=FALSE}
+messy_pop %>%
+  arrange(desc(`2002`))  #<<
+```
+```{r dplyr-after-arrange-eval, echo=FALSE}
+messy_pop %>%
+  arrange(desc(`2002`)) %>%
+  as_table()
+```
+]
+---
+
+.left-column[
+### Mutate
+### Select
+### Filter
+### Arrange
+### Summarize
+```{r sidebar-summarize, eval=FALSE}
+summarize(...) #<<
+```
+]
+.column-right[
+```{r dplyr-before-summarize, echo=FALSE}
+as_table(messy_pop)
+```
+```{r dplyr-after-summarize-echo, eval=FALSE}
+messy_pop %>%
+  summarize(`1997` = mean(`1997`), `2002` = mean(`2002`))  #<<
+```
+```{r dplyr-after-summarize-eval, echo=FALSE}
+messy_pop %>%
+  summarize(`1997` = mean(`1997`), `2002` = mean(`2002`)) %>%
+  as_table()
+```
+]
+
+---
+layout: true
+# Single-table verbs
+
+.left-column[
+### Mutate
+### Select
+### Filter
+### Arrange
+### Summarize
+### Group by
+```{r sidebar-group_by, eval=FALSE}
+group_by(...) #<<
+```
+]
+
+---
+
+.right-column[
+```{r dplyr-before-groupby, echo=-1}
+set.seed(42)
+americas %>%  # has 48 rows
+  sample_n(6)
+```
+]
+
+---
+
+.right-column[
+```{r dplyr-before-groupby-compute-echo, eval=FALSE}
+americas %>%
+  summarize(lifeExp=mean(lifeExp), gdbPercap=mean(gdpPercap)) %>%
+  arrange(lifeExp)
+```
+```{r dplyr-before-groupby-compute-eval, echo=FALSE}
+americas %>%
+  summarize(lifeExp=mean(lifeExp), gdbPercap=mean(gdpPercap)) %>%
+  arrange(lifeExp) %>%
+  as_table()
+```
+]
+
+---
+
+.right-column[
+```{r dplyr-after-groupby-echo, eval=FALSE}
+americas %>%
+  group_by(country) %>%  #<<
+  summarize(lifeExp=mean(lifeExp), gdbPercap=mean(gdpPercap)) %>%
+  arrange(lifeExp)
+```
+```{r dplyr-after-groupby-eval, echo=FALSE}
+americas %>%
+  group_by(country) %>%
+  summarize(lifeExp=mean(lifeExp), gdbPercap=mean(gdpPercap)) %>%
+  arrange(lifeExp)
+```
+]
 
 ---
 layout: false
 
-# ggplot2 Extensions: ggplot2-exts.org
+# Two-table verbs
 
-<img src="images/ggplot2-exts-gallery.png" style="max-height: 100%">
+## When we have multiple tables contributing to an analysis...
 
----
-# ggplot2 and beyond
+.font120[
++ .hl[Mutating joins]: Add variables from one table to another with matching columns
++ .hl[Filtering joins]: Keep/remove observations using matches in another table
++ .hl[Set operations]: Treat rows as elements of a mathematical set
 
-### Learn more
-
-- **ggplot2 docs:** <http://ggplot2.tidyverse.org/>
-
-- **R4DS - Data visualization:** <http://r4ds.had.co.nz/data-visualisation.html>
-
-- **Hadley Wickham's ggplot2 book:** <https://www.amazon.com/dp/0387981403/>
-
-### Noteworthy RStudio Add-Ins
-
-- [esquisse](https://github.com/dreamRs/esquisse): Interactively build ggplot2 plots
-
-- [ggplotThemeAssist](https://github.com/calligross/ggthemeassist): Customize your ggplot theme interactively
-
-- [ggedit](https://github.com/metrumresearchgroup/ggedit): Layer, scale, and theme editing
+See
+[`vignette("two-table")`](https://dplyr.tidyverse.org/articles/two-table.html)
+for more details...
+]
 
 ---
+layout: false
+class: inverse center middle text-white
 
-# Practice and Review
-
-### #TidyTuesday
-
-- <https://github.com/rfordatascience/tidytuesday>
-
-### Fun Datasets
-
-- `fivethirtyeight`
-
-- `nycflights`
-
-- `ggplot2movies`
-
-### Review
-
-- Slides and code on GitHub: <http://github.com/gadenbuie/gentle-ggplot2>
+.font200[
+Tidyverse and other packages
+]
 
 ---
-class: inverse, center, middle
+# Not enough time to go over all the great packages...
 
-# Thanks!
+### Tidyverse
 
-.font150.text-white[
-@grrrck <br>
-github.com/gadenbuie <br>
-Garrick Aden-Buie
++ .hl[`tidyr`]: tidy the messiest of data
++ .hl[`purrr`]: take apply and Reduce to the next level
++ .hl[`stringr`]: sane string handling (have you ever tried `"hello" + "world"`?)
++ .hl[`forcats`]: sane factors and handy releveling (R's most confusing datatype)
++ .hl[`readxl`]: when your wet-lab collaborator gives you an Excel spreadsheet
++ .hl[`broom`]: turn statistical/ML models into tidy tables (*sorry I wasn't able to do this*!)
+
+### Other packages
+
++ [ggplot2 extensions (link)](http://www.ggplot2-exts.org/gallery/): especially
+  .hl[`cowplot`] or .hl[`egg`] for multi-plot figures
++ .hl[`data.table`] and/or .hl[`sparklyr`]: when you have to work with really
+  large data
++ [Bioconductor (link)](https://www.bioconductor.org/install/): open source
+  software for bioinformatics
+
+.footnote[
+Broom + tidyr + purrr can be used to do some serious cross-validation: see
+[tutorial](http://sjspielman.org/bio5312_fall2017/files/kfold_supplement.pdf)
+]
+
+---
+# Last tips and tricks, other resources
+
+.font150[
++ Subsample your data (`dplyr::sample_{frac,n}`) when testing code
++ [Simulate random data](https://bookdown.org/ndphillips/YaRrr/generating-random-data.html)
+  to gain intuition/check assumptions
+.font80[
+  - Especially as a sanity check when thinking about weird distributions for GCB 533
+]
++ Look at your data when analyzing it ([pathologic cases](https://en.wikipedia.org/wiki/Anscombe%27s_quartet))
++ Organizing analyses ([Noble et al 2009](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1000424))
++ Learn to use version control ([slides](http://jtleek.com/advdatasci/slides/02-organizing-version-control-slides.html))
++ Ask for help!
+]
+
+---
+layout: false
+class: inverse center middle text-white
+
+.font200[
+Questions and practicum
 ]
