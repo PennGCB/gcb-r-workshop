@@ -104,6 +104,10 @@ that you can perceive."
 Adapted from <https://blog.rstudio.com/2014/01/17/introducing-dplyr/>
 ]
 
+???
+
+TODO: show function to add stars corresponding to custom p-values
+
 ---
 
 # TODO
@@ -118,22 +122,6 @@ layout: false
 class: inverse center middle text-white
 
 .font200[Getting started with ggplot2]
-
----
-
-## My personal reasons
-
-- .hl[Functional] data visualization
-
-    1. Wrange data
-    2. Map data to visual elements
-    3. Tweak scales, guides, axis, labels, theme
-
-- Easy to .hl[reason] about how data drives visualization
-
-- Easy to .hl[iterate]
-
-- Easy to be .hl[consistent]
 
 ---
 layout: false
@@ -165,57 +153,42 @@ Going to throw a lot at you
 .img-right[![](images/poppins-bag-kids.gif)]
 
 ---
-layout: true
-# G is for getting started
+
+# What is the general process for using *ggplot2*?
+
+.font150[
+* .hl[Functional] data visualization
+    1. Define data being used
+    2. Map data to visual elements
+    3. Tweak scales, guides, axis, labels, theme
+]
+--
+.font150[
+* .hl[Reason] about how data drives the visualization
+]
+--
+.font150[
+* .hl[Iterate] on visualization
+]
+
+???
+
+Easy to be consistent as we do this process
 
 ---
 
+# *gg* is for *grammar of graphics*
 
-**Easy**: install the [tidyverse](http://tidyverse.org)
+.left-code[
+"Good grammar is just the first step in creating a good sentence."
 
-```r
-install.packages('tidyverse')
-```
+#### How is the drawing on the right connected to data?
 
-**Medium**: install just `ggplot2`
+.footnote[<http://vita.had.co.nz/papers/layered-grammar.pdf>]
+]
 
-```r
-install.pacakages('ggplot2')
-```
-
-**Expert**: install from GitHub
-
-```r
-devtools::install_github('tidyverse/ggplot2')
-```
-
----
-
-## Load the tidyverse
-
-```{r library-tidyverse, echo=TRUE, message=TRUE, warning=TRUE}
-library(tidyverse)
-```
-
----
-## Other packages you'll need for this adventure
-
-We'll use an excerpt of the [gapminder](http://www.gapminder.org/data/) dataset provided by the [`gapminder` package](https://github.com/jennybc/gapminder) by Jenny Bryan.
-
-<https://github.com/jennybc/gapminder>
-
-```{r library-extra, message=FALSE, eval=-1}
-install.packages("gapminder")
-library(gapminder)
-```
-
----
-layout: false
-class: inverse center middle text-white
-
-.font200[gg is for<br>Grammar of Graphics]
-
-```{r guess-data-from-plot-og, echo=FALSE}
+.right-plot[
+```{r guess-data-from-plot-0, echo=FALSE}
 df_mpg <- mpg %>% 
   filter(class %in% c("compact", "suv")) %>% 
   filter(manufacturer %in% c("toyota", "ford", "audi")) %>% 
@@ -233,21 +206,7 @@ g <- ggplot(df_mpg) +
     plot.background = element_rect(fill = rgb(250, 250, 250, max = 255),
                                    color = "#777777")
   )
-```
----
 
-# What is a grammar of graphics?
-
-.left-code[
-"Good grammar is just the first step in creating a good sentence."
-
-#### How is the drawing on the right connected to data?
-
-.footnote[<http://vita.had.co.nz/papers/layered-grammar.pdf>]
-]
-
-.right-plot[
-```{r guess-data-from-plot-0, echo=FALSE}
 g + 
   guides(color = FALSE, shape = FALSE) +
   theme(axis.text = element_blank())
