@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+  <head>
+    <title>Data visualization and manipulation in R:</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Joseph K Aicher (Barash/Bhoj Labs) Derived from bit.ly/gentle-ggplot2" />
+    <meta name="date" content="2019-08-23" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis.css" rel="stylesheet" />
+    <link href="libs/remark-css/metropolis-fonts.css" rel="stylesheet" />
+    <link rel="stylesheet" href="gentle-ggplot2.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data visualization and manipulation in R:
+## ggplot2, dplyr, and the tidyverse
+### Joseph K Aicher (Barash/Bhoj Labs)<br>Derived from <strong>bit.ly/gentle-ggplot2</strong>
+### 2019-08-23
+
+---
+
+
+class: fullscreen, inverse, top, center, text-white
+background-image: url("images/letter-g.jpg")
+
+.font150[**Brought to you by the letter...**]
+
+
+
+---
+# Learning objectives
+
+.font150[
+
+* Why you should learn .hl[ggplot2] and .hl[dplyr]
+* Mechanics and getting started with **ggplot2**
+* Transforming data using **dplyr**
+* What is the .hl[tidyverse]?
+
+]
+
+---
+# What is *ggplot2*?
+
+--
+
+.left-column[
+![](images/hadley.jpg)
+__Hadley Wickham__
+]
+
+--
+
+.right-column[.font150[
+"[.hl[ggplot2] is] a powerful way of thinking about visualisation, as a way of
+**mapping between variables and the visual properties of geometric objects**
+that you can perceive."
+]
+.footnote[&lt;http://disq.us/p/sv640d&gt;]
+]
+
+---
+# What is *dplyr*?
+
+--
+
+.font150[
+.hl[dplyr] provides a set of tools for efficiently manipulating datasets in R.
+]
+
+--
+
+.font150[
+.hl[Key ideas]:
+
+* Tabular data is tabular data regardless of source
+* Most tasks are a composition of simple operations
+
+]
+
+.footnote[
+Adapted from &lt;https://blog.rstudio.com/2014/01/17/introducing-dplyr/&gt;
+]
+
+---
+
+# What is the *tidyverse*?
+
+.font150[
+"The tidyverse is an opinionated .hl[collection of R packages] designed for
+data science. All packages have an underlying design
+[philosophy](https://www.jstatsoft.org/article/view/v059i10), grammar,
+and data structures" ([tidyverse.org](https://tidyverse.org))
+]
+
+.left-column[
+![](images/tidy.png)
+]
+
+.right-column[.font120[
+* `tidyr`: clean and reshape your data
+* `readr`: better file parsing
+* `tibble`: better data frames
+* `purrr`: better functional programming
+* ... and many more (i.e. `broom`)...
+]]
+
+.footnote[
+Incredibly accessible and deep online textbook:
+[R for Data Science](https://r4ds.had.co.nz)
+]
+
+???
+
+So why should you learn tidyverse? Basically shared design philosophy means
+that adopting tools within the tidyverse becomes easier and easier. Things fail
+consistently and there are less silent errors due to weird R type stuff. It's
+expressive and allow you to think more about what you want to do instead of how
+you are going to do it.
+
+---
+layout: false
+class: inverse center middle text-white
+
+.font200[Getting started with ggplot2]
+
+---
+layout: false
+
+# What are we getting into?
+
+&lt;br&gt;
+`ggplot2` is a huge package: philosophy + functions
+&lt;br&gt;...but it's very well organized
+
+--
+
+&lt;br&gt;&lt;br&gt;
+*Lots* of examples of not-so-great plots in these slides
+&lt;br&gt;...but that's okay
+
+--
+
+&lt;br&gt;&lt;br&gt;
+Going to throw a lot at you
+&lt;br&gt;...but you'll know *where* and *what* to look for
+
+--
+
+.img-right[![](images/poppins-bag.gif)]
+
+--
+
+.img-right[![](images/poppins-bag-kids.gif)]
+
+---
+
+# What is the general process for using *ggplot2*?
+
+.font150[
+* .hl[Functional] data visualization
+    1. Define data being used
+    2. Map data to visual elements
+    3. Tweak scales, guides, axis, labels, theme
+]
+--
+.font150[
+* .hl[Reason] about how data drives the visualization
+]
+--
+.font150[
+* .hl[Iterate] on visualization
+]
+
+???
+
+Easy to be consistent as we do this process
+
+---
+
+# *gg* is for *grammar of graphics*
+
+.left-code[
+"Good grammar is just the first step in creating a good sentence."
+
+#### How is the drawing on the right connected to data?
+
+.footnote[&lt;http://vita.had.co.nz/papers/layered-grammar.pdf&gt;]
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-0-1.png" width="100%" /&gt;
+]
+
+---
+layout: true
+# Guess the data behind this plot?
+
+.left-code[
+### MPG Ratings of Cars
+
+- Manufacturer
+- Car Type (Class)
+- City MPG
+- Highway MPG
+]
+
+---
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-2-1.png" width="100%" /&gt;
+]
+
+---
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-3-1.png" width="100%" /&gt;
+]
+
+---
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-1-1.png" width="100%" /&gt;
+]
+
+---
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-4-1.png" width="100%" /&gt;
+]
+
+---
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-5-1.png" width="100%" /&gt;
+]
+
+---
+
+.right-plot[
+&lt;img src="index_files/figure-html/guess-data-from-plot-6-1.png" width="100%" /&gt;
+]
+
+---
+
+.right-plot[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; manufacturer &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; class &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; cty &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; hwy &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; model &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; audi &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; compact &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; a4 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; audi &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; compact &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 25 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; a4 quattro &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; ford &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; suv &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 12 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; expedition 2wd &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; ford &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; suv &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; explorer 4wd &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; toyota &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; suv &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 4runner 4wd &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; toyota &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; compact &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; camry solara &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; toyota &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; compact &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 35 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; corolla &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; toyota &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; suv &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; land cruiser wagon 4wd &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+layout: false
+# How do we express visuals in words?
+
+.font120[
+- **Data** to be visualized
+]
+
+--
+.font120[
+- **.hlb[Geom]etric objects** that appear on the plot
+]
+
+--
+.font120[
+- **.hlb[Aes]thetic mappings** from data to visual component
+]
+
+--
+.font120[
+- **.hlb[Stat]istics** transform data on the way to visualization
+]
+
+--
+.font120[
+- **.hlb[Coord]inates** organize location of geometric objects
+]
+
+--
+.font120[
+- **.hlb[Scale]s** define the range of values for aesthetics
+]
+
+--
+.font120[
+- **.hlb[Facet]s** group into subplots
+]
+
+
+---
+layout: true
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+
+```r
+ggplot(data)
+```
+]
+
+---
+
+.right-column[
+#### Tidy Data
+
+1. Each variable forms a .hl[column]
+
+2. Each observation forms a .hl[row]
+
+3. Each observational unit forms a table
+]
+
+--
+
+.right-column[
+#### Start by asking
+
+1. What information do I want to use in my visualization?
+
+1. Is that data contained in .hl[one column/row] for a given data point?
+]
+
+---
+
+.right-column[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2002 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2007 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.30584 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.90227 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.39014 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1230.07500 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1280.40000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1318.68310 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.91176 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.67553 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.13995 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+--
+
+.right-column[
+
+```r
+# NOTE: using `tidyr` here, pivoting "longer"
+tidy_pop &lt;- gather(messy_pop, 'year', 'pop', -country)
+```
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; year &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; pop &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.306 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1230.075 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.912 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.902 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1280.400 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2002 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.676 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.390 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1318.683 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.140 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+
+---
+layout: true
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+
+```r
++ aes()
+```
+
+]
+---
+
+.right-column[
+Map data to visual elements or parameters
+
+- year
+
+- pop
+
+- country
+]
+
+---
+
+.right-column[
+Map data to visual elements or parameters
+
+- year → **x**
+
+- pop → **y**
+
+- country → *shape*, *color*, etc.
+]
+
+---
+
+.right-column[
+Map data to visual elements or parameters
+
+```r
+aes(
+  x = year,
+  y = pop,
+  color = country
+)
+```
+]
+
+---
+layout: true
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+
+```r
++ geom_*()
+```
+]
+
+---
+
+.right-column[
+Geometric objects displayed on the plot
+
+&lt;img src="index_files/figure-html/geom_demo-1.png" width="650px" /&gt;
+]
+
+---
+
+.right-column[
+Here are the [some of the most widely used geoms](https://eric.netlify.com/2017/08/10/most-popular-ggplot2-geoms/)
+
+.font70.center[
+| Type | Function |
+|:----:|:--------:|
+| Point | `geom_point()` |
+| Line | `geom_line()` |
+| Bar | `geom_bar()`, `geom_col()` |
+| Histogram | `geom_histogram()` |
+| Regression | `geom_smooth()` |
+| Boxplot | `geom_boxplot()` |
+| Text | `geom_text()` |
+| Vert./Horiz. Line | `geom_{vh}line()` |
+| Count | `geom_count()` |
+| Density | `geom_density()` |
+
+&lt;https://eric.netlify.com/2017/08/10/most-popular-ggplot2-geoms/&gt;
+]
+]
+
+
+---
+
+.right-column[
+
+See &lt;http://ggplot2.tidyverse.org/reference/&gt; for many more options
+
+.font70[
+
+```
+##  [1] "geom_abline"     "geom_area"       "geom_bar"        "geom_bin2d"     
+##  [5] "geom_blank"      "geom_boxplot"    "geom_col"        "geom_contour"   
+##  [9] "geom_count"      "geom_crossbar"   "geom_curve"      "geom_density"   
+## [13] "geom_density_2d" "geom_density2d"  "geom_dotplot"    "geom_errorbar"  
+## [17] "geom_errorbarh"  "geom_freqpoly"   "geom_hex"        "geom_histogram" 
+## [21] "geom_hline"      "geom_jitter"     "geom_label"      "geom_line"      
+## [25] "geom_linerange"  "geom_map"        "geom_path"       "geom_point"     
+## [29] "geom_pointrange" "geom_polygon"    "geom_qq"         "geom_qq_line"   
+## [33] "geom_quantile"   "geom_raster"     "geom_rect"       "geom_ribbon"    
+## [37] "geom_rug"        "geom_segment"    "geom_sf"         "geom_sf_label"  
+## [41] "geom_sf_text"    "geom_smooth"     "geom_spoke"      "geom_step"      
+## [45] "geom_text"       "geom_tile"       "geom_violin"     "geom_vline"
+```
+]
+]
+--
+
+.right-column[
+&lt;img src="images/geom.gif" width="200px" style="float: right; margin-right: 100px; margin-top: -25px;"&gt;
+Or just start typing `geom_` in RStudio
+]
+
+
+---
+layout: true
+# Our first plot!
+---
+
+.left-code[
+
+```r
+ggplot(tidy_pop)
+```
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot1a-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+
+```r
+ggplot(tidy_pop) +
+* aes(x = year,
+*     y = pop)
+```
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot1b-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+
+```r
+ggplot(tidy_pop) +
+  aes(x = year,
+      y = pop) +
+* geom_point()
+```
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot1c-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+
+```r
+ggplot(tidy_pop) +
+  aes(x = year,
+      y = pop,
+*     color = country) +
+  geom_point()
+```
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot1-out-1.png" width="100%" /&gt;
+]
+
+---
+
+.left-code[
+
+```r
+ggplot(tidy_pop) +
+  aes(x = year,
+      y = pop,
+      color = country) +
+  geom_point() +
+* geom_line()
+```
+
+.font80[
+```r
+geom_path: Each group consists
+of only one observation. 
+Do you need to adjust the 
+group aesthetic?
+```
+]
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot2-fake-out-1.png" width="100%" /&gt;
+]
+---
+
+.left-code[
+
+```r
+ggplot(tidy_pop) +
+  aes(x = year,
+      y = pop,
+      color = country) +
+  geom_point() +
+  geom_line(
+*   aes(group = country))
+```
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot2-out-1.png" width="100%" /&gt;
+]
+
+---
+
+
+.left-code[
+
+```r
+g &lt;- ggplot(tidy_pop) +
+  aes(x = year,
+      y = pop,
+      color = country) +
+  geom_point() +
+  geom_line(
+    aes(group = country))
+
+g
+```
+]
+
+.right-plot[
+&lt;img src="index_files/figure-html/first-plot3-out-1.png" width="100%" /&gt;
+]
+
+---
+layout: true
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+
+```r
++ geom_*()
+```
+]
+---
+
+.right-column[
+```r
+geom_*(mapping, data, stat, position)
+```
+
+- `data` Geoms can have their own data
+    - Has to map onto global coordinates
+
+- `map` Geoms can have their own aesthetics
+    - Inherits global aesthetics
+    - Have geom-specific aesthetics
+        - `geom_point` needs `x` and `y`, optional `shape`, `color`, `size`, etc.
+        - `geom_ribbon` requires `x`, `ymin` and `ymax`, optional `fill`
+    - `?geom_ribbon`
+]
+
+---
+
+.right-column[
+```r
+geom_*(mapping, data, stat, position)
+```
+
+- `stat` Some geoms apply further transformations to the data
+    - All respect `stat = 'identity'`
+    - Ex: `geom_histogram` uses `stat_bin()` to group observations
+    
+- `position` Some adjust location of objects
+    - `'dodge'`, `'stack'`, `'jitter'`
+]
+
+---
+layout: true
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+
+```r
++facet_wrap() 
+
++facet_grid()
+```
+]
+---
+
+
+
+.right-column[
+
+```r
+g + facet_wrap(~ country)
+```
+
+&lt;img src="index_files/figure-html/geom_facet-1.png" width="90%" /&gt;
+]
+
+---
+
+.right-column[
+
+```r
+g + facet_grid(continent ~ country)
+```
+
+&lt;img src="index_files/figure-html/geom_grid-1.png" width="90%" /&gt;
+]
+
+---
+layout: true
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+
+```r
++ labs()
+```
+]
+---
+
+.right-column[
+
+```r
+g + labs(x = "Year", y = "Population")
+```
+
+&lt;img src="index_files/figure-html/labs-ex-1.png" width="90%" /&gt;
+]
+
+---
+layout: true
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Coords
+
+```r
++ coord_*()
+```
+]
+---
+
+.right-column[
+
+```r
+g + coord_flip()
+```
+
+&lt;img src="index_files/figure-html/coord-ex-1.png" width="90%" /&gt;
+]
+
+---
+
+.right-column[
+
+```r
+g + coord_polar()
+```
+
+&lt;img src="index_files/figure-html/coord-ex2-1.png" width="90%" /&gt;
+]
+
+---
+layout: true
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Coords
+### Scales
+
+```r
++ scale_*_*()
+```
+]
+---
+
+.right-column[ 
+`scale` + `_` + `&lt;aes&gt;` + `_` + `&lt;type&gt;` + `()`
+
+What parameter do you want to adjust? → `&lt;aes&gt;` &lt;br&gt;
+What type is the parameter? → `&lt;type&gt;`
+
+- I want to change my discrete x-axis&lt;br&gt;`scale_x_discrete()`
+- I want to change range of point sizes from continuous variable&lt;br&gt;`scale_size_continuous()`
+- I want to rescale y-axis as log&lt;br&gt;`scale_y_log10()`
+- I want to use a different color palette&lt;br&gt;`scale_fill_discrete()`&lt;br&gt;`scale_color_manual()`
+]
+
+---
+
+.right-column[
+
+```r
+g + scale_color_manual(values = c("peru", "pink", "plum"))
+```
+
+&lt;img src="index_files/figure-html/scale_ex1-1.png" width="90%" /&gt;
+]
+
+---
+
+.right-column[
+
+```r
+g + scale_y_log10()
+```
+
+&lt;img src="index_files/figure-html/scale_ex2-1.png" width="90%" /&gt;
+]
+
+---
+
+.right-column[
+
+```r
+g + scale_x_discrete(labels = c("MCMXCVII", "MMII", "MMVII"))
+```
+
+&lt;img src="index_files/figure-html/scale_ex4-1.png" width="90%" /&gt;
+]
+
+---
+layout: true
+# gg is for Grammar of Graphics
+
+.left-column[
+### Data
+### Aesthetics
+### Geoms
+### Facet
+### Labels
+### Coords
+### Scales
+### Theme
+
+```r
++ theme()
+```
+]
+
+---
+
+.right-column[
+Change the appearance of plot decorations&lt;br&gt;
+i.e. things that aren't mapped to data
+
+A few "starter" themes ship with the package
+
+- `g + theme_bw()`
+- `g + theme_dark()`
+- `g + theme_gray()`
+- `g + theme_light()`
+- `g + theme_minimal()`
+
+]
+
+---
+
+.right-column[
+Huge number of parameters, grouped by plot area:
+
+- Global options: `line`, `rect`, `text`, `title`
+- `axis`: x-, y- or other axis title, ticks, lines
+- `legend`: Plot legends
+- `panel`: Actual plot area
+- `plot`: Whole image
+- `strip`: Facet labels
+]
+
+Check out3
+[emilyriederer/ugliest-ggplot-theme.R](https://gist.github.com/emilyriederer/2bf4f67d7e198f8359b61706c82e42ee)!
+
+---
+
+.right-column[
+Theme options are supported by helper functions:
+
+- `element_blank()` removes the element
+- `element_line()`
+- `element_rect()`
+- `element_text()`
+
+]
+
+---
+
+.right-column[
+
+```r
+g + theme_bw()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-1-1.png" width="90%" /&gt;
+]
+
+---
+
+.right-column[
+.font80[
+
+```r
+g + theme_minimal() + theme(text = element_text(family = "Palatino"))
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-2-1.png" width="90%" /&gt;
+]
+]
+
+---
+
+.right-column[
+You can also set the theme globally with `theme_set()`
+
+
+```r
+my_theme &lt;- theme_bw() +
+  theme(
+    text = element_text(family = "Palatino", size = 12),
+    panel.border = element_rect(colour = 'grey80'), 
+    panel.grid.minor = element_blank()
+  )
+
+theme_set(my_theme)
+```
+
+All plots will now use this theme!
+]
+
+---
+
+.right-column[
+
+```r
+g
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-3-1.png" width="90%" /&gt;
+]
+
+---
+
+.right-column[
+
+```r
+g + theme(legend.position = 'bottom')
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-4-1.png" width="90%" /&gt;
+]
+
+---
+layout: false
+# Save Your Work
+
+To save your plot, use **ggsave**
+
+
+```r
+ggsave(
+  filename = "my_plot.png",
+  plot = my_plot,
+  width = 10,
+  height = 8,
+  dpi = 100,
+  device = "png"
+)
+```
+
+---
+layout: false
+count: hide
+class: fullscreen, inverse, top, left, text-white
+background-image: url(images/super-grover.jpg)
+
+.font200[You have the power!]
+
+---
+layout: false
+class: inverse center middle text-white
+
+.font200[Getting started with dplyr]
+
+.footnote[
+Inspired by
+[dplyr slides](https://therbootcamp.github.io/BaselRBootcamp_2018April/_sessions/D2S1_Wrangling/Wrangling.html)
+]
+
+---
+
+# What is *dplyr*?
+
+.pull-left[
+.font150[
+.hl[dplyr] combines:
+]
+
+.font140[
+1. .hl[tables]
+2. .hl[verbs] that .hl[do] things to tables
+3. .hl[pipes] that string together tables and verbs
+]
+
+.font150[
+Most tasks can be written as a sequence of simple verbs.
+]
+]
+
+--
+
+.pull-right[
+## The pipe %&gt;%
+
+I want to apply `A`, `B`, then `C` on `df`.
+
+{{content}}
+]
+
+--
+
+### without pipes
+
+
+```r
+C(B(A(df)))  # like, please don't.
+```
+
+{{content}}
+
+--
+
+### with pipes
+
+
+```r
+df %&gt;%  # start with df
+  A() %&gt;%  # then apply A
+  B() %&gt;%  # then apply B
+  C()  # then apply C
+```
+
+---
+layout: true
+# Single-table verbs
+---
+
+.font130[
+Most comon set of verbs:
+
++ `mutate()`: new variables as functions of existing variables
++ `select()`: select subset of variables (columns)
++ `filter()`: select subset of observations (rows)
++ `arrange()`: reorder observations
++ `summarize()`: reduce multiple observations to single summary
+]
+
+--
+
+.font130[
+Combine with `group_by()` which allows performing operations "by group"
+]
+
+---
+
+.right-column[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2002 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2007 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.306 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.902 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.390 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1230.075 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1280.400 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1318.683 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.912 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.676 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.140 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+.center[
+Examples operating on the table `messy_pop`...
+]
+]
+
+---
+
+.left-column[
+### Mutate
+
+```r
+*mutate(...)
+```
+]
+
+.column-right[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2002 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2007 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.306 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.902 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.390 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1230.075 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1280.400 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1318.683 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.912 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.676 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.140 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+```r
+messy_pop %&gt;%
+* mutate(average=(`1997` + `2002` + `2007`) / 3)
+```
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2002 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2007 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; average &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.306 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.902 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.390 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.866 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1230.075 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1280.400 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1318.683 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1276.386 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.912 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.676 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.140 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.242 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+
+
+---
+
+.left-column[
+### Mutate
+### Select
+
+```r
+*select(...)
+```
+]
+.column-right[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2002 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2007 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.306 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.902 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.390 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1230.075 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1280.400 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1318.683 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.912 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.676 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.140 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+```r
+messy_pop %&gt;%
+* select(`1997`, `2007`)
+```
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2007 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 30.306 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.390 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 1230.075 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1318.683 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 272.912 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.140 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+.left-column[
+### Mutate
+### Select
+### Filter
+
+```r
+*filter(...)
+```
+]
+.column-right[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2002 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2007 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.306 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.902 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.390 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1230.075 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1280.400 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1318.683 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.912 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.676 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.140 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+```r
+messy_pop %&gt;%
+* filter(`2002` &lt; 500)
+```
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2002 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2007 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.306 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.902 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.39 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.912 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.676 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.14 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+.left-column[
+### Mutate
+### Select
+### Filter
+### Arrange
+
+```r
+*arrange(...)
+```
+]
+.column-right[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2002 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2007 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.306 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.902 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.390 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1230.075 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1280.400 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1318.683 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.912 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.676 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.140 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+```r
+messy_pop %&gt;%
+* arrange(desc(`2002`))
+```
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2002 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2007 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1230.075 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1280.400 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1318.683 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.912 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.676 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.140 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.306 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.902 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.390 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+---
+
+.left-column[
+### Mutate
+### Select
+### Filter
+### Arrange
+### Summarize
+
+```r
+*summarize(...)
+```
+]
+.column-right[
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2002 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2007 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30.306 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 31.902 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 33.390 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; China &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1230.075 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1280.400 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1318.683 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 272.912 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 287.676 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 301.140 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+```r
+messy_pop %&gt;%
+* summarize(`1997` = mean(`1997`), `2002` = mean(`2002`))
+```
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; 1997 &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; 2002 &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 511.098 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 533.326 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+layout: true
+# Single-table verbs
+
+.left-column[
+### Mutate
+### Select
+### Filter
+### Arrange
+### Summarize
+### Group by
+
+```r
+*group_by(...)
+```
+]
+
+---
+
+.right-column[
+
+```r
+americas %&gt;%  # has 48 rows
+  sample_n(6)
+```
+
+&lt;div class="kable-table"&gt;
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; continent &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; year &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; lifeExp &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; pop &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; gdpPercap &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.440 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 157553000 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 13990.482 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68.750 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 14785584 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11367.161 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mexico &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1952 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 50.789 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30144317 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3478.126 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1997 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 78.610 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 30305843 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 28954.926 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mexico &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 76.195 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 108700891 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 11977.575 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Ecuador &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Americas &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1977 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 61.310 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7278866 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6679.623 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;/div&gt;
+]
+
+---
+
+.right-column[
+
+```r
+americas %&gt;%
+  summarize(lifeExp=mean(lifeExp), gdbPercap=mean(gdpPercap)) %&gt;%
+  arrange(lifeExp)
+```
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:right;"&gt; lifeExp &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; gdbPercap &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:right;"&gt; 69.152 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 15532.41 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+
+---
+
+.right-column[
+
+```r
+americas %&gt;%
+* group_by(country) %&gt;%
+  summarize(lifeExp=mean(lifeExp), gdbPercap=mean(gdpPercap)) %&gt;%
+  arrange(lifeExp)
+```
+&lt;div class="kable-table"&gt;
+
+&lt;table&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; country &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; lifeExp &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; gdbPercap &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Ecuador &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 62.81683 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5733.625 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Mexico &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 65.40883 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 7724.113 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; United States &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 73.47850 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 26261.151 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Canada &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 74.90275 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 22410.746 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;/div&gt;
+]
+
+---
+layout: false
+
+# Two-table verbs
+
+## When we have multiple tables contributing to an analysis...
+
+.font120[
++ .hl[Mutating joins]: Add variables from one table to another with matching columns
++ .hl[Filtering joins]: Keep/remove observations using matches in another table
++ .hl[Set operations]: Treat rows as elements of a mathematical set
+
+See
+[`vignette("two-table")`](https://dplyr.tidyverse.org/articles/two-table.html)
+for more details...
+]
+
+---
+layout: false
+class: inverse center middle text-white
+
+.font200[
+Tidyverse and other packages
+]
+
+---
+# Not enough time to go over all the great packages...
+
+### Tidyverse
+
++ .hl[`tidyr`]: tidy the messiest of data
++ .hl[`purrr`]: take apply and Reduce to the next level
++ .hl[`stringr`]: sane string handling (have you ever tried `"hello" + "world"`?)
++ .hl[`forcats`]: sane factors and handy releveling (R's most confusing datatype)
++ .hl[`readxl`]: when your wet-lab collaborator gives you an Excel spreadsheet
++ .hl[`broom`]: turn statistical/ML models into tidy tables (*sorry I wasn't able to do this*!)
+
+### Other packages
+
++ [ggplot2 extensions (link)](http://www.ggplot2-exts.org/gallery/): especially
+  .hl[`cowplot`] or .hl[`egg`] for multi-plot figures
++ .hl[`data.table`] and/or .hl[`sparklyr`]: when you have to work with really
+  large data
++ [Bioconductor (link)](https://www.bioconductor.org/install/): open source
+  software for bioinformatics
+
+.footnote[
+Broom + tidyr + purrr can be used to do some serious cross-validation: see
+[tutorial](http://sjspielman.org/bio5312_fall2017/files/kfold_supplement.pdf)
+]
+
+---
+# Last tips and tricks, other resources
+
+.font150[
++ Subsample your data (`dplyr::sample_{frac,n}`) when testing code
++ [Simulate random data](https://bookdown.org/ndphillips/YaRrr/generating-random-data.html)
+  to gain intuition/check assumptions
+.font80[
+  - Especially as a sanity check when thinking about weird distributions for GCB 533
+]
++ Look at your data when analyzing it ([pathologic cases](https://en.wikipedia.org/wiki/Anscombe%27s_quartet))
++ Organizing analyses ([Noble et al 2009](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1000424))
++ Learn to use version control ([slides](http://jtleek.com/advdatasci/slides/02-organizing-version-control-slides.html))
++ Ask for help!
+]
+
+---
+layout: false
+class: inverse center middle text-white
+
+.font200[
+Questions and practicum
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "foundation",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "%current%"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

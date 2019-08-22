@@ -24,6 +24,18 @@ background-image: url("images/letter-g.jpg")
 .font150[**Brought to you by the letter...**]
 
 ```{r setup, include=FALSE}
+library(tidyverse)
+library(gapminder)
+americas <- 
+  gapminder %>% 
+  filter(
+    country %in% c(
+      "United States",
+      "Canada",
+      "Mexico",
+      "Ecuador"
+    )
+  )
 knitr::opts_chunk$set(fig.width=4.25, fig.height=3.5, fig.retina=3,
                       out.width = "100%",
                       message=FALSE, warning=FALSE, cache = TRUE, 
