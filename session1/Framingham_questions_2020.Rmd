@@ -1,0 +1,179 @@
+## Framingham Heart Study
+
+Here, we will go through some tasks involved in analyzing a real dataset. Here are some commonly used functions to be aware of:
+help: 
+
+* `help(function)`: view documentaiton of a function. Also, `?function`
+* `setwd`: Set your current working directory. For example, it may be a good idea to set the working directory to the location of this file.
+* `read.csv, read.table, read.delim`: Read a delimited text file (e.g. comma-separated, tab-separated) into a data frame
+* `dim`: Get the number of rows and columns of a matrix or data frame
+* `head`: View the first _n_ elements or lines of a vector, matrix, or data frame (n = 6 by default)
+* `colnames`: View the column names of a matrix or data frame
+* `rownames`: View the row names of a matrix or data frame
+* `summary`: View summary statistics of an R object or fitted model
+* `complete.cases`: Returns a logical (boolean) vector where TRUE denotes a row of a data frame or matrix that has no NA values
+* `mean`, `median`: Get the mean or median value of a vector
+* `write.table, write.csv`: Write a data frame to a delimited text file. Commonly used parameters are `sep`, `row.names`, and `quote`.
+* `hist`: Create a histogram based on a vector of values with base R plotting
+* `barplot`: Create a barplot of values given a vector of bar heights
+* `plot(x,y)`: Create a scatterplot given x and y coordinates. `plot` is also used as a generic plotting function for many R objects.
+* `cor.test`: Perform a statistical test for the correlation between two variables
+* `boxplot`: Create a boxplot
+* `table`: Compute tabulated counts of a dicrete variable, or a pair of discrete variables
+* `glm`: Fit generalized linear models, ranging from standard linear regression to logistic regression and others
+
+
+## Loading and Viewing data
+
+In research, data is often organized into a table of some kind, with columns corresponding to variables and rows corresponding to observations. For example, we may have a collection of demographic data (e.g. for each row, a state, its population, poverty and crime rates, land area, etc.), gene expression data (for each row, a gene ID, its genomic coordinates, and its expression across tissues), or electronic health records (you can imagine having rows for patients *or* individual hospital visits; what kinds of variables would you collect?). These data are generally stored in an external file, with a uniform delimiter separating columns, and must be loaded into R for analysis. Let's load data from the Framingham Heart Study, a long-term study of the epidemiology of various cardiovascular conditions that has been going on for over 70 years.
+
+```{r eval=TRUE}
+fhs = read.csv("Framingham.dat")
+```
+
+It is a good idea to make sure we have read in the data properly. How many rows and columns are in this data frame?
+```{r}
+## Your code here
+```
+
+Now, let's view the first 6 lines of the data frame:
+```{r}
+## Your code here
+```
+
+What are the column names of this data frame?
+```{r}
+## Your code here
+```
+
+Let's get some summary statistics of each column using the __summary__ function. For example, we might want to get a sense of what was the mean age, and whether the Female:Male ratio is relatively balanced.
+```{r}
+## Your code here
+```
+
+It is important to be aware of missing data in any analysis. How many rows have at least one missing (NA) value? How many rows have no missing values?
+
+```{r}
+## Your code here
+```
+
+We can see that we have 7 columns with integer values and one column with Factor values for "FEMALE" and "MALE." Note the count of `NA` in the `Heart.Disease`, `FRW`, and `CIG` columns. What happens when you try to use the __mean__ function on one of these columns, such as `Heart.Disease`? How can we get the mean, ignoring NA values?
+
+```{r}
+## Your code here
+```
+
+There are many ways to handle missing data, but since the majority of cases are complete, let's throw out any row will a missing value, and call our new data frame `fhs.clean`. Then, we'll check the dimensions of this new data frame, to make sure we did it properly.
+
+```{r}
+## Your code here
+```
+
+Now that we have some nice clean data let's save it to file for later. Let's safe the file as a tab-delimited text file without row names or quotes.
+```{r}
+## Your code here
+```
+
+It's also good data science practice to get a sense of the distribution of your variables. Let's plot histograms of the systolic and diastolic blood pressures. Are they roughly normally distributed (looking at if the histograms are unimodal, roughly symmetric)?
+
+```{r}
+## Your code here
+```
+
+We can also normalize these variables to have mean 0 and standard deviation 1 using `scale`:
+
+```{r}
+## Your code here
+```
+
+We can plot the histograms of all numerical variables (`AGE`, `SBP`, `DBP`, `CHOL`, `FRW`). There are several ways to do this, either using `par(mfrow=c(2,3))` or using `tidyr` and `ggplot`, which will be taught next lesson.
+
+```{r}
+# With base R plotting
+## Your code here
+```
+
+```{r}
+# with tidyr and ggplot:
+## Your code here
+```
+
+Now that we have a sense of each individual variable, let's plot two continuous variables. We will plot diastolic vs systolic blood pressure in two different ways with the `plot` function. First, let's plot these variables by explicitly providing x and y coordinates to the plot function:
+
+```{r}
+## Your code here
+```
+
+
+Next, let's made the exact same plot using a convention where we provide a formula in terms of column names of a data frame, in addition to the data frame itself. We can use the same `plot` function, but for documentation see `help(plot.formula)`
+```{r}
+## Your code here
+```
+
+The syntax `SBP ~ DBP` takes advantage of R's `formula`. This is commonly used in R's statistical tests and can be read as "compare the response variable on the left-hand-side (SBP) to the predictor variable on the right-hand-side (DBP)." You'll see this syntax often.
+
+# Continuous vs. Continuous
+
+Systolic and diastolic blood pressure look correlated! Let's measure the Pearson and Spearman correlations between them
+
+```{r}
+## Your code here
+```
+
+Let's focus on the Pearson correlation. Are these correlations significant? Save the results of `cor.test` to a variable called `pearson.corr`.
+
+```{r}
+## Your code here
+```
+
+`2.2e-16` is the lowest p-value R generally displays; we can extract a more precise p-value since we saved the output of `cor.test`.
+
+```{r}
+## Your code here
+```
+
+`1.750138e-299` is a hilariously low p-value; we can confidently say that diastolic and systolic blood pressure are correlated.
+
+# Continuous vs. Discrete
+
+We can also visualize a continuous variable against a discrete variable, say diastolic blood pressure by sex, using a boxplot:
+
+```{r}
+## Your code here
+```
+
+These look quite similar, we can test if males have significantly different diastolic blood pressure than females using a t-test. Save the output of `t.test` to a variable called `dbp_sex.t`.
+
+```{r}
+## Your code here
+```
+
+We can see that R has returned several useful objects from our t-test, including the method (one-sided, two-sided, one-sample, two-sample), the estimate (means in each group), the confidence interval of the difference in mean, and the p-value:
+
+```{r}
+## Your code here
+```
+
+# Discrete vs. Discrete
+
+How about analyzing two discrete or categorial variables? Say we want to compare the rate of heart disease in males vs. females. We can use a contingency table, and save it to the variable `hd_sex.tab`:
+
+```{r}
+## Your code here
+```
+
+To test whether males and females have significantly different odds, ignoring other factors, we will use a Fisher's Exact Test:
+
+```{r}
+## Your code here
+```
+
+Finally, we will perform a statistical test to assess the contribution of each variable to our main outcome. `Heart.Disease.`.
+
+Because our response variable `Heart.Disease.` is binary (you have it or you don't), normal linear regression doesn't make sense. We'll instead use the generalized linear model `glm` function to run logistic regression, with `family='binomial'`. Save the output to a variable called `fhs.glm`, and use the `summary` function to visualize the model output. Which variables are associated with heart disease?
+
+```{r}
+## Your code here
+```
+
+Notice our use of the formula `Heart.Disease ~ .`: this tells R to regression `Heart.Disease.` against all other variables. Using our logistic regression approach, we find that Age, maleness, systolic (but *not* diastolic) blood pressure, cholesterol, and cigarettes are all significantly and independently associated with heart disease risk. These results are ready to go into a paper, and all with a one or two lines of code! Hopefully this highlights the power of R.
